@@ -1,9 +1,25 @@
+# walkerkq 2.3.2016 
+# textmining_southpark
+########################
+# R script to calculate the log likelihood of each ngram for each speaker compared to the rest 
+# of the text. 
+########################
+# Input: (all created in 02_southpark_corpus.R, dependent on 01_southpark_scrape.R) 
+### southpark_tdm.csv: data frame of term document matrix of unigrams
+### southpark_bi_tdm_wstop.csv: data frame of term document matrix of bigrams, including stopwords
+### southpark_tri_tdm_wstop.csv: data frame of term document matrix of trigrams, including stopwords
+### southpark_quad_tdm_wstop.csv: data frame of term document matrix of 4-grams, including stopwords
+### southpark_quint_tdm_wstop.csv: data frame of term document matrix of 5-grams, including stopwords
+########################
+# Output: 
+### southpark_ngrams.csv: contains ngram, log likelihood and associated figures for each speaker.  
+########################
+
+
 library(tm)
 library(stringr)
 setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data/tdm/")
 count.tdm <- read.csv("southpark_tdm.csv", stringsAsFactors=FALSE)
-count.bi.tdm <- read.csv("southpark_bi_tdm.csv", stringsAsFactors=FALSE)
-count.tri.tdm <- read.csv("southpark_tri_tdm.csv", stringsAsFactors=FALSE)
 count.bi.ws.tdm <- read.csv("southpark_bi_tdm_wstop.csv", stringsAsFactors=FALSE)
 count.tri.ws.tdm <- read.csv("southpark_tri_tdm_wstop.csv", stringsAsFactors=FALSE)
 count.quad.ws.tdm <- read.csv("southpark_quad_tdm_wstop.csv", stringsAsFactors=FALSE)
@@ -52,7 +68,7 @@ LL.all <- function(df, wordlist, speaker) {
      return(LL.df)
 }
 
-############################ UNIGRAMS ############################
+#################################### UNIGRAMS
 
 everybody <- NULL
 people <- c("CARTMAN", "STAN", "KENNY", "CHEF", "MR..GARRISON", "WENDY", "NARRATOR", "ANNOUNCER", "JIMBO", "MAYOR", "JESUS", "TERRANCE", "REPORTER", "COUNSELOR.MACKEY", "SHARON", "RANDY", "JIMMY", "BUTTERS", "CHRIS", "MS..CHOKSONDIK", "MEPHESTO", "MS..CARTMAN", "KYLE", "ALL.OTHERS")
@@ -60,16 +76,10 @@ for(person in people) {
      temp <- LL.all(count.tdm, count.tdm, person)
      everybody <- rbind(everybody, temp)
 }
-#write.csv(everybody, "LL_each.csv", row.names=FALSE)
 
 
-############################ BI GRAMS ############################
-bi.everybody <- NULL
-for(person in people) {
-     temp <- LL.all(df=count.bi.ws.tdm, count.bi.ws.tdm, speaker=person)
-     bi.everybody <- rbind(bi.ws.everybody, temp)
-}
-#write.csv(bi.everybody, "LL_bi_each.csv", row.names=FALSE)
+#################################### BIGRAMS
+
 bi.ws.everybody <- NULL
 for(person in people) {
      temp.p <- subset(count.bi.ws.tdm, select=person)
@@ -79,16 +89,10 @@ for(person in people) {
      temp <- LL.all(df=count.bi.ws.tdm, wordlist=temp.c, speaker=person)
      bi.ws.everybody <- rbind(bi.ws.everybody, temp)
 }
-#write.csv(bi.ws.everybody, "LL_bi_ws_each.csv", row.names=FALSE)
 
-############################ TRI GRAMS ############################
 
-tri.everybody <- NULL
-for(person in people) {
-     temp <- LL.all(df=count.tri.ws.tdm, wordlist=temp.c, speaker=person)
-     tri.everybody <- rbind(tri.everybody, temp)
-}
-#write.csv(tri.everybody, "LL_tri_each.csv", row.names=FALSE)
+#################################### TRIGRAMS
+
 tri.ws.everybody <- NULL
 for(person in people) {
      temp.p <- subset(count.tri.ws.tdm, select=person)
@@ -100,10 +104,9 @@ for(person in people) {
           tri.ws.everybody <- rbind(tri.ws.everybody, temp)
      }
 }
-#write.csv(tri.everybody, "LL_tri_ws_each.csv", row.names=FALSE)
 
 
-############################ QUAD GRAMS ############################
+#################################### 4-GRAMS
 
 quad.ws.everybody <- NULL
 for(person in people) {
@@ -116,9 +119,9 @@ for(person in people) {
           quad.ws.everybody <- rbind(quad.ws.everybody, temp)
      }
 }
-#write.csv(quad.ws.everybody, "LL_quad_ws_each.csv", row.names=FALSE)
 
-############################ 5 GRAMS ############################
+
+#################################### 5-GRAMS
 
 quint.ws.everybody <- NULL
 for(person in people) {
@@ -131,10 +134,10 @@ for(person in people) {
           quint.ws.everybody <- rbind(quint.ws.everybody, temp)
      }
 }
-#write.csv(quint.ws.everybody, "LL_quad_ws_each.csv", row.names=FALSE)
 
 
-################## Combine it all together ###################### 
+#################################### COMBINE
+
 everybody$ngram <- 1
 bi.ws.everybody$ngram <- 2
 tri.ws.everybody$ngram <- 3

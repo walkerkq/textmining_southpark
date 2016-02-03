@@ -1,4 +1,15 @@
-# http://www.imsdb.com/transcripts/South-Park-Rainforest-Schmainforest.html
+# walkerkq 2.3.2016 
+# textmining_southpark
+########################
+# R script to scrape South Park transcripts from the Internet Movie Script Database
+# located at http://www.imsdb.com/TV/South%20Park.html using the XML, stringr and 
+# RCurl packages. 
+########################
+# Output: three large .csv files.
+### southpark_all_scripts.csv: each line of the transcript and its speaker, episode and episode number 
+### southpark_byepidsode_scripts.csv: combined text from each speaker by episode
+### southpark_byperson_scripts.csv: combined text from each speaker across all episodes  
+########################
 
 library("RCurl")
 library("XML")
@@ -16,9 +27,10 @@ listing.f <- gsub("^\\s+|\\s+$", "", listing.f)
 listing.f <- tolower(listing.f)
 listing.f <- gsub("\\s", "-", listing.f)
 
+# loop through episode pages, scrape lines and store in all.text
+
 URLstart <- "http://www.imsdb.com/transcripts/South-Park-"
 all.text <- NULL
-
 for(h in 1:length(listing.f)) {
      URL <- paste(URLstart, listing.f[h], ".html", sep="")
      script <- readLines(URL)
@@ -111,6 +123,5 @@ mfix <- str_c(mfix$text, collapse=" ")
 by_person <- by_person[(by_person$speaker!="KYLE"), ]
 by_person <- by_person[(by_person$speaker!="KYLE TWO"), ]
 by_person <- rbind(by_person, data.frame(speaker="KYLE", text=mfix))
-
 
 #write.csv(by_person, "southpark_byperson_scripts.csv", row.names=FALSE)

@@ -16,9 +16,9 @@ opts_chunk$set(cache=TRUE, fig.width=10, fig.height=8, echo=FALSE)
 
 ```{r}
 #setwd("/Users/kaylinwalker/R/textmining_southpark/scripts")
-#source("southpark_Scrape.R") # scrapes raw text from the web, saves into 'all', 'byepisode' and 'byperson' files
-#source("southpark_getCorpus.R") # creates a corpus of the byperson file
-#source("southpark_LL.R") # generates log likelihoods for each corpus of words
+#source("01_southpark_scrape.R") # scrapes raw text from the web, saves into 'all', 'byepisode' and 'byperson' files
+#source("02_southpark_corpus.R") # creates a corpus of the byperson file
+#source("03_southpark_loglikelihood.R") # generates log likelihoods for each corpus of words
 
 setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data")
 ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
