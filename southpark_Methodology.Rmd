@@ -11,6 +11,9 @@ library(knitr)
 library(stringr)
 library(ggplot2)
 opts_chunk$set(cache=TRUE, fig.width=10, echo=FALSE)
+
+setwd("/Users/kwalker/git_projects/textmining_southpark/tidy data")
+ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
 ```
 
 ## Intro  
@@ -23,27 +26,19 @@ Transcripts of the first 132 episodes of South Park (season 1 through season 9, 
 I was able to assign a speaker to each line by splitting the html at `<b>` tags that contained only uppercase text and were shorter than 40 characters. Each line was followed by a blank line, so I used their index to create a starting and stopping point for text to be attributed to a speaker. From there, I used the tm package to pre-process the text (to lowercase, remove punctuation, numbers and whitespace; remove stopwords for unigrams and bigrams, but left them in for tri-, 4- and 5-grams) and form a corpus, which contained more than 18,000 unique words spoken more than 211,000 times. Reducing the sparsity brought that down to about 2,300 words spoken 172,000 times. 
 
 ```{r breakdown}
-counts <- data.frame(grams=c("unigrams", "bigrams", "trigrams", "4-grams", "5-grams"),
-                     unique=c(2379, 5849, 1927, 742, 131),
-                     total=c(172269, 168320, 31027, 6911, 1610))
+count <- ngrams[ ,c(2,3,10)]
+count <- count[!duplicated(count),]
+counts <- aggregate(word.total ~ ngram, count, sum)
+unique <- data.frame(table(count$ngram)); rm(count)
+counts <- cbind(counts, unique[,2])
+colnames(counts) <- c("ngram.size", "total", "unique")
 kable(counts, row.names=FALSE)
-```
-
-```{r}
-setwd("/Users/kaylinwalker/Desktop/South Park")
-#source("southpark_Scrape_2.R") # scrapes raw text from the web, saves into 'all', 'byepisode' and 'byperson' files
-#source("southpark_getCorpus.R") # creates a corpus of the byperson file
-#source("southpark_LL.R") # generates log likelihoods for each corpus of words
-
-setwd("/Users/kaylinwalker/Desktop/South Park/data")
-ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
-unigrams <- ngrams[ngrams$ngram==1, ]
-
 ```
 
 24 characters with the most words were retained, and the remaining 1781 speakers combined into one "all others" category so as not to lose the text. 
 
 ```{r characters}
+unigrams <- ngrams[ngrams$ngram==1, ]
 characters <- unique(unigrams$speaker)
 chars <- NULL
 for(character in characters){
@@ -58,7 +53,8 @@ chars <- chars[c(2:24,1),]
 chars$speaker <- factor(chars$speaker, levels=chars$speaker)
 ggplot(chars, aes(speaker, word.share)) + geom_bar(stat="identity", fill="lightblue") + geom_text(label=chars$speaker.total, vjust=-1, size=3) + theme_classic() + theme(axis.text.x = element_text(angle = 20, hjust = 1))+ labs(title="Number of Words by Character")
 ```
-
+  
+    
 ### Log Likelihood  
 Each corpus was analyze to determine the most characteristic words for each speaker. Frequent and characteristic words are not the same thing - otherwise words like "I", "school", and "you" would rise to the top instead of unique words and phrases like "professor chaos", "hippies" and "you killed kenny." 
 
@@ -84,13 +80,6 @@ kable(logtable, row.names=FALSE, caption="Basic Framework")
 ```
 
 ```{r}
-logl <- data.frame(Level=c("5%", "1%", "0.1%", "0.01%"),
-                   Critical.Value=c(3.84, 6.63, 10.83, 15.13),
-                   P.Value=c("0.05", "0.01", "0.001", ".0001"))
-kable(logl, row.names=FALSE, caption="Log Likelihood Significance Levels")
-```
-
-```{r}
 extable <- data.frame(Group=c("'hippies'", "Not 'hippies'", "Total"),
                        Cartmans.Text=c("36", "28170", "28206"),
                        Remaining.Text=c("5", "144058", "144063"),
@@ -106,8 +95,27 @@ LL = 2 * [36 * log(36/6.71) + 5 * log(5/34.28) ] = 101.7
 Based on the overall ratio of the word "hippies" in the text, 41/172269 = 0.00023, we would expect to see hippies in Cartman's speech 6.71 times and in the remaining text 34.28 times. The log likelihood value of 101.7 is significant far beyond even the 0.01% level.  
   
   
-   
+```{r}
+logl <- data.frame(Level=c("5%", "1%", "0.1%", "0.01%"),
+                   Critical.Value=c(3.84, 6.63, 10.83, 15.13),
+                   P.Value=c("0.05", "0.01", "0.001", ".0001"))
+kable(logl, row.names=FALSE, caption="Log Likelihood Significance Levels")
+```
 
+
+### Significance of Log Likelihood Scores  
+
+
+```{r, fig.width=3, fig.height=3, fig.align="center"}
+ngrams$sig <- FALSE
+for(h in seq_along(ngrams[,1])) if(ngrams$LL[h] > 10.83) ngrams$sig[h] <- TRUE
+siglevel <- data.frame(table(ngrams$sig))
+sigpercent <- round(siglevel$Freq[2]/sum(siglevel$Freq), 4)*100
+```
+    
+`r sigpercent`% (`r siglevel$Freq[2]`/`r sum(siglevel$Freq)`) of ngrams were found to be significantly characteristic for a ceratin character.  
+
+  
 ### References  
 Dunning, T. (1993) *Accurate Methods for the Statistics of Surprise and Coincidence.* Computational Linguistics, 19, 1, March 1993, pp. 61-74.   
 Kilgarriff. A. (1996) *Why chi-square doesn't work, and an improved LOB-Brown comparison.* ALLC-ACH Conference, June 1996, Bergen, Norway.  
