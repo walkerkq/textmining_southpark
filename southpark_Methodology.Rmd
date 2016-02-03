@@ -1,0 +1,113 @@
+---
+title: "South Park Methodology"
+author: "Kaylin Walker"
+date: "February 2, 2016"
+output: pdf_document
+---
+
+```{r opts, warning=FALSE, message=FALSE, echo=FALSE}
+library(tm)
+library(knitr)
+library(stringr)
+library(ggplot2)
+opts_chunk$set(cache=TRUE, fig.width=10, echo=FALSE)
+```
+
+## Intro  
+
+
+
+## Method & Summary Statistics  
+Transcripts of the first 132 episodes of South Park (season 1 through season 9, episode 7) were scraped from unstructured text on the [Internet Movie Script Database](http://www.imsdb.com/TV/South%20Park.html) using the XML package. The series has run for 19 seasons and 267 episodes, but to my knowledge the remaining transcripts are not available online.   
+
+I was able to assign a speaker to each line by splitting the html at `<b>` tags that contained only uppercase text and were shorter than 40 characters. Each line was followed by a blank line, so I used their index to create a starting and stopping point for text to be attributed to a speaker. From there, I used the tm package to pre-process the text (to lowercase, remove punctuation, numbers and whitespace; remove stopwords for unigrams and bigrams, but left them in for tri-, 4- and 5-grams) and form a corpus, which contained more than 18,000 unique words spoken more than 211,000 times. Reducing the sparsity brought that down to about 2,300 words spoken 172,000 times. 
+
+```{r breakdown}
+counts <- data.frame(grams=c("unigrams", "bigrams", "trigrams", "4-grams", "5-grams"),
+                     unique=c(2379, 5849, 1927, 742, 131),
+                     total=c(172269, 168320, 31027, 6911, 1610))
+kable(counts, row.names=FALSE)
+```
+
+```{r}
+setwd("/Users/kaylinwalker/Desktop/South Park")
+#source("southpark_Scrape_2.R") # scrapes raw text from the web, saves into 'all', 'byepisode' and 'byperson' files
+#source("southpark_getCorpus.R") # creates a corpus of the byperson file
+#source("southpark_LL.R") # generates log likelihoods for each corpus of words
+
+setwd("/Users/kaylinwalker/Desktop/South Park/data")
+ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
+unigrams <- ngrams[ngrams$ngram==1, ]
+
+```
+
+24 characters with the most words were retained, and the remaining 1781 speakers combined into one "all others" category so as not to lose the text. 
+
+```{r characters}
+characters <- unique(unigrams$speaker)
+chars <- NULL
+for(character in characters){
+     b <- unigrams[unigrams$speaker==character, ]
+     b <- b[1, c(1,4)]
+     chars <- rbind(chars, b)
+}
+total <- sum(chars$speaker.total)
+chars$word.share <- round(chars$speaker.total/total,2)
+chars <- chars[order(-chars$speaker.total), ]
+chars <- chars[c(2:24,1),]
+chars$speaker <- factor(chars$speaker, levels=chars$speaker)
+ggplot(chars, aes(speaker, word.share)) + geom_bar(stat="identity", fill="lightblue") + geom_text(label=chars$speaker.total, vjust=-1, size=3) + theme_classic() + theme(axis.text.x = element_text(angle = 20, hjust = 1))+ labs(title="Number of Words by Character")
+```
+
+### Log Likelihood  
+Each corpus was analyze to determine the most characteristic words for each speaker. Frequent and characteristic words are not the same thing - otherwise words like "I", "school", and "you" would rise to the top instead of unique words and phrases like "professor chaos", "hippies" and "you killed kenny." 
+
+Log likelihood was used to measure the unique-ness of the n-grams by character. Log likelihood compares the occurrence of a word in a particular corpus (the body of a character's speech) to its occurrence in another corpus (all of the remaining South Park text) to determine if it shows up more or less likely that expected.  
+
+The **chi-square test ($\chi^{2}$)**, or goodness-of-fit test, can be used to compare the occurrence of a word across corpora.  
+$$\chi^{2} = \sum \frac{(O_i-E_i)^{2}}{E_i}$$   
+where O = observed frequency and E = expected frequency.   
+
+However, flaws have been identified: invalidity at low frequencies (Dunning, 1993) and over-emphasis of common words (Kilgariff, 1996). Dunning was able to show that the **log-likelihood statistic** was accurate even at low frequencies:  
+
+$$2 \sum O_i * ln(\frac{O_i}{E_i})$$  
+
+Which can be computed from the contingency table below as $2*((a*log(\frac{a}{E1}) + (b*log(\frac{b}{E2}))$, where E1 = $(a+c)*\frac{(a+b)}{(c+d)}$, and E2 = $(b+d)*\frac{(a+b)}{(c+d)}$.  
+
+
+```{r}
+logtable <- data.frame(Group=c("Word", "Not Word", "Total"),
+                       Corpus.One=c("a", "c", "a+c"),
+                       Corpus.Two=c("b", "d", "b+d"),
+                       Total=c("a+b", "c+d", "N=a+b+c+d"))
+kable(logtable, row.names=FALSE, caption="Basic Framework")
+```
+
+```{r}
+logl <- data.frame(Level=c("5%", "1%", "0.1%", "0.01%"),
+                   Critical.Value=c(3.84, 6.63, 10.83, 15.13),
+                   P.Value=c("0.05", "0.01", "0.001", ".0001"))
+kable(logl, row.names=FALSE, caption="Log Likelihood Significance Levels")
+```
+
+```{r}
+extable <- data.frame(Group=c("'hippies'", "Not 'hippies'", "Total"),
+                       Cartmans.Text=c("36", "28170", "28206"),
+                       Remaining.Text=c("5", "144058", "144063"),
+                       Total=c("41", "172228", "172269"))
+kable(extable, row.names=FALSE, caption ="An Example")
+```
+
+Computed:  
+E1 = 28206 * (41/172269) = 6.71
+E2 = 144063 * (41/172269) = 34.28  
+LL = 2 * [36 * log(36/6.71) + 5 * log(5/34.28) ] = 101.7  
+
+Based on the overall ratio of the word "hippies" in the text, 41/172269 = 0.00023, we would expect to see hippies in Cartman's speech 6.71 times and in the remaining text 34.28 times. The log likelihood value of 101.7 is significant far beyond even the 0.01% level.  
+  
+  
+   
+
+### References  
+Dunning, T. (1993) *Accurate Methods for the Statistics of Surprise and Coincidence.* Computational Linguistics, 19, 1, March 1993, pp. 61-74.   
+Kilgarriff. A. (1996) *Why chi-square doesn't work, and an improved LOB-Brown comparison.* ALLC-ACH Conference, June 1996, Bergen, Norway.  

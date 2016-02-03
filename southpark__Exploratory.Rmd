@@ -1,0 +1,55 @@
+---
+title: "South Park Exploratory Analysis"
+author: "kwalker"
+date: "January 27, 2016"
+output: html_document
+---
+
+```{r opts, warning=FALSE, message=FALSE, echo=FALSE}
+library(knitr)
+library(stringr)
+library(ggplot2)
+library(RColorBrewer)
+opts_chunk$set(cache=TRUE, fig.width=10, fig.height=8, echo=FALSE)
+```
+
+
+```{r}
+#setwd("/Users/kaylinwalker/R/textmining_southpark/scripts")
+#source("southpark_Scrape.R") # scrapes raw text from the web, saves into 'all', 'byepisode' and 'byperson' files
+#source("southpark_getCorpus.R") # creates a corpus of the byperson file
+#source("southpark_LL.R") # generates log likelihoods for each corpus of words
+
+setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data")
+ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
+
+main.speakers <- c("CARTMAN", "STAN", "KYLE", "KENNY", "RANDY", "BUTTERS", "MR..GARRISON")
+
+ngrams <- ngrams[ngrams$LL >= 10.83, ] # 1073 / 21106 = 5%
+ngrams.main <- ngrams[ngrams$speaker %in% main.speakers & ngrams$direction=="HIGH", ]
+ngrams.norepeat <- NULL
+
+#for(j in seq_along(ngrams.main[,1])) {
+#     if(ngrams$ngram[j] > 1) {
+ #         
+ #    } 
+ #    ngrams.norepeat <- rbind(ngrams.norepeat, ngrams.main[j,])
+#}
+
+
+ngrams.main.2 <- ngrams.main[ngrams.main$speaker %in% c("CARTMAN", "STAN", "KYLE", "KENNY"), ]
+ggplot(ngrams.main.2, aes(speaker, log(LL))) + 
+     geom_point(color="white") + 
+     geom_text(aes(label=ngrams.main.2$word, size=log(ngrams.main.2$word.total), 
+                   color=ngrams.main.2$speaker), alpha=0.9) + 
+     scale_size(range=c(5,10)) +
+     scale_color_brewer(palette="Paired") +
+     theme_classic() + 
+     theme(axis.text.x = element_text(angle = 20, hjust = 1), legend.position=1) + 
+     labs(title="Most Characteristic Words & Phrases by Character") + 
+     xlab("") + ylab("Log(Log Likelihood)")
+
+```
+
+
+
