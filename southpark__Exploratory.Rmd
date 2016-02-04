@@ -16,9 +16,9 @@ opts_chunk$set(cache=TRUE, fig.width=10, fig.height=8, echo=FALSE)
 
 ```{r}
 #setwd("/Users/kaylinwalker/R/textmining_southpark/scripts")
-#source("01_southpark_scrape.R") # scrapes raw text from the web, saves into 'all', 'byepisode' and 'byperson' files
-#source("02_southpark_corpus.R") # creates a corpus of the byperson file
-#source("03_southpark_loglikelihood.R") # generates log likelihoods for each corpus of words
+#source("01_southpark_scrape.R") 
+#source("02_southpark_corpus.R") 
+#source("03_southpark_loglikelihood.R") 
 
 setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data")
 ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
@@ -27,21 +27,27 @@ main.speakers <- c("CARTMAN", "STAN", "KYLE", "KENNY", "RANDY", "BUTTERS", "MR..
 
 ngrams <- ngrams[ngrams$LL >= 10.83, ] # 1073 / 21106 = 5%
 ngrams.main <- ngrams[ngrams$speaker %in% main.speakers & ngrams$direction=="HIGH", ]
-ngrams.norepeat <- NULL
 
-#for(j in seq_along(ngrams.main[,1])) {
-#     if(ngrams$ngram[j] > 1) {
- #         
- #    } 
- #    ngrams.norepeat <- rbind(ngrams.norepeat, ngrams.main[j,])
-#}
+## remove redundant ngrams like "you guys" vs. "you guys i" and "guys you guys"
+ngrams.norepeat <- ngrams[ngrams$ngram==1, ]
+bi <- ngrams[ngrams$ngram == 2, ]
+bi <- unique(bi$word)
+for(h in seq_along(bi)) {
+     for(s in main.speakers) {
+          temp <- ngrams[grepl(bi[h], ngrams$word) & ngrams$speaker==s, ]
+          if(length(temp[,1]) > 0 ) {
+          temp <- temp[order(-temp$LL), ]          
+          ngrams.norepeat <- rbind(ngrams.norepeat, temp[1,])
+          }
+     }
+}
+ngrams.norepeat <- unique(ngrams.norepeat)
 
-
-ngrams.main.2 <- ngrams.main[ngrams.main$speaker %in% c("CARTMAN", "STAN", "KYLE", "KENNY"), ]
+ngrams.main.2 <- ngrams.norepeat[ngrams.norepeat$speaker %in% c("CARTMAN", "STAN", "KYLE", "KENNY")  & ngrams.norepeat$direction=="HIGH", ]
 ggplot(ngrams.main.2, aes(speaker, log(LL))) + 
      geom_point(color="white") + 
      geom_text(aes(label=ngrams.main.2$word, size=log(ngrams.main.2$word.total), 
-                   color=ngrams.main.2$speaker), alpha=0.9) + 
+                   color=ngrams.main.2$speaker), alpha=0.75) + 
      scale_size(range=c(5,10)) +
      scale_color_brewer(palette="Paired") +
      theme_classic() + 

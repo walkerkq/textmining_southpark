@@ -1,7 +1,6 @@
 ---
 title: "South Park Methodology"
-author: "Kaylin Walker"
-date: "February 2, 2016"
+author: "Kaylin Walker • February 2, 2016"
 output: pdf_document
 ---
 
@@ -12,12 +11,19 @@ library(stringr)
 library(ggplot2)
 opts_chunk$set(cache=TRUE, fig.width=10, echo=FALSE)
 
-setwd("/Users/kwalker/git_projects/textmining_southpark/tidy data")
+#setwd("/Users/kwalker/git_projects/textmining_southpark/tidy data")
+setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data")
 ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
 ```
 
-## Intro  
+## Abstract    
+Quickly after Matt Stone and Trey Parker launched South Park, an adult animated series, in 1997, it became known for its use of crude language and dark satire of current events. Stone and Parker, the primary writers, producers and voice actors, have given the series a unique voice and personality. Each episode opens with the disclaimer:   
 
+> "All characters and events in this show—even those based on real people—are entirely fictional. All celebrity voices are impersonated.....poorly. The following program contains coarse language and due to its content it should not be viewed by anyone."   
+
+The series follows four main characters (Stan, Kyle, Cartman and Kenny), though it has an extensive ensemble cast of recurring characters. This analysis serves to analyze their speech to determine which words and phrases are distinct for each character. Since the series uses a lot of running gags, common phrases should be easy to find.  
+
+The programming language R and packages XML, RCurl, tm, RWeka and stringr were used to scrape South Park episode transcripts from the internet, attribute them to a certain character, break them into ngrams and identify chracteristic ngrams for each character.   
 
 
 ## Method & Summary Statistics  
@@ -35,7 +41,7 @@ colnames(counts) <- c("ngram.size", "total", "unique")
 kable(counts, row.names=FALSE)
 ```
 
-24 characters with the most words were retained, and the remaining 1781 speakers combined into one "all others" category so as not to lose the text. 
+23 characters with the most words were retained, and the remaining 1781 speakers combined into one "all others" category so as not to lose the text. 
 
 ```{r characters}
 unigrams <- ngrams[ngrams$ngram==1, ]
@@ -51,14 +57,17 @@ chars$word.share <- round(chars$speaker.total/total,2)
 chars <- chars[order(-chars$speaker.total), ]
 chars <- chars[c(2:24,1),]
 chars$speaker <- factor(chars$speaker, levels=chars$speaker)
-ggplot(chars, aes(speaker, word.share)) + geom_bar(stat="identity", fill="lightblue") + geom_text(label=chars$speaker.total, vjust=-1, size=3) + theme_classic() + theme(axis.text.x = element_text(angle = 20, hjust = 1))+ labs(title="Number of Words by Character")
+colnames(chars) <- c("speaker", "words")
+chars$speaker <- tolower(chars$speaker)
+charsk <- cbind(chars[1:8,1:2], chars[9:16,1:2], chars[17:24,1:2])
+kable(charsk, row.names=FALSE, caption="Number of Words by Character")
 ```
   
     
 ### Log Likelihood  
-Each corpus was analyze to determine the most characteristic words for each speaker. Frequent and characteristic words are not the same thing - otherwise words like "I", "school", and "you" would rise to the top instead of unique words and phrases like "professor chaos", "hippies" and "you killed kenny." 
+Each corpus was analyzed to determine the most characteristic words for each speaker. Frequent and characteristic words are not the same thing - otherwise words like "I", "school", and "you" would rise to the top instead of unique words and phrases like "professor chaos", "hippies" and "you killed kenny." 
 
-Log likelihood was used to measure the unique-ness of the n-grams by character. Log likelihood compares the occurrence of a word in a particular corpus (the body of a character's speech) to its occurrence in another corpus (all of the remaining South Park text) to determine if it shows up more or less likely that expected.  
+Log likelihood was used to measure the unique-ness of the n-grams by character. Log likelihood compares the occurrence of a word in a particular corpus (the body of a character's speech) to its occurrence in another corpus (all of the remaining South Park text) to determine if it shows up more or less likely that expected. The returned value represents the likelihood that the corpora are from the same, larger corpus, like a t-test. The higher the score, the more unlikely.    
 
 The **chi-square test ($\chi^{2}$)**, or goodness-of-fit test, can be used to compare the occurrence of a word across corpora.  
 $$\chi^{2} = \sum \frac{(O_i-E_i)^{2}}{E_i}$$   
@@ -84,7 +93,7 @@ extable <- data.frame(Group=c("'hippies'", "Not 'hippies'", "Total"),
                        Cartmans.Text=c("36", "28170", "28206"),
                        Remaining.Text=c("5", "144058", "144063"),
                        Total=c("41", "172228", "172269"))
-kable(extable, row.names=FALSE, caption ="An Example")
+kable(extable, row.names=FALSE, caption ="An Example with Log Likelihood 101.7")
 ```
 
 Computed:  
@@ -92,28 +101,31 @@ E1 = 28206 * (41/172269) = 6.71
 E2 = 144063 * (41/172269) = 34.28  
 LL = 2 * [36 * log(36/6.71) + 5 * log(5/34.28) ] = 101.7  
 
-Based on the overall ratio of the word "hippies" in the text, 41/172269 = 0.00023, we would expect to see hippies in Cartman's speech 6.71 times and in the remaining text 34.28 times. The log likelihood value of 101.7 is significant far beyond even the 0.01% level.  
+Based on the overall ratio of the word "hippies" in the text, 41/172269 = 0.00023, we would expect to see hippies in Cartman's speech 6.71 times and in the remaining text 34.28 times. The log likelihood value of 101.7 is significant far beyond even the 0.01% level, so we can reject the null hypothesis that Cartman and the remaining text are one and the same.    
   
-  
+For this analysis, a significance level of 0.001 was chosen to balance the number of significant ngrams with significance. 5.64% of ngrams were found to be significantly charcteristic of a certain character.  
+
+
 ```{r}
+
+find_sig <- function(level) {
+     ngrams$sig <- FALSE
+     for(h in seq_along(ngrams[,1])) if(ngrams$LL[h] > level) ngrams$sig[h] <- TRUE
+     siglevel <- data.frame(table(ngrams$sig))
+     sigpercent <- round(siglevel$Freq[2]/sum(siglevel$Freq), 4)*100
+     return(sigpercent)
+}
+
+
 logl <- data.frame(Level=c("5%", "1%", "0.1%", "0.01%"),
                    Critical.Value=c(3.84, 6.63, 10.83, 15.13),
-                   P.Value=c("0.05", "0.01", "0.001", ".0001"))
+                   P.Value=c("0.05", "0.01", ".001", ".0001"))
+for(h in 1:4) logl$Percent.Sig[h] <- find_sig(logl$Critical.Value[h])
+
 kable(logl, row.names=FALSE, caption="Log Likelihood Significance Levels")
 ```
 
 
-### Significance of Log Likelihood Scores  
-
-
-```{r, fig.width=3, fig.height=3, fig.align="center"}
-ngrams$sig <- FALSE
-for(h in seq_along(ngrams[,1])) if(ngrams$LL[h] > 10.83) ngrams$sig[h] <- TRUE
-siglevel <- data.frame(table(ngrams$sig))
-sigpercent <- round(siglevel$Freq[2]/sum(siglevel$Freq), 4)*100
-```
-    
-`r sigpercent`% (`r siglevel$Freq[2]`/`r sum(siglevel$Freq)`) of ngrams were found to be significantly characteristic for a ceratin character.  
 
   
 ### References  
