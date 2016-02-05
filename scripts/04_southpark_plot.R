@@ -68,7 +68,7 @@ ggplot(ranked, aes(speaker, rank2)) +
     geom_label(aes(label=ranked$word,fill=ranked$speaker), color='white', fontface='bold') +
     scale_fill_brewer(palette="Paired") +
     theme_classic() +
-    theme(legend.position=1) + 
-    labs(title="Most Characteristic Words & Phrases by Character") + 
-    xlab("") + ylab("Ranking")  +
+    theme(legend.position=1,plot.title = element_text(size=22)) + 
+    labs(title="Most Characteristic Words & Phrases by South Park Character") + 
+    xlab("") + ylab("Ranking") +
     scale_y_continuous(breaks = c(25), labels = c("Highest"))
