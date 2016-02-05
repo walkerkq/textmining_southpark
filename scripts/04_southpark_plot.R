@@ -70,4 +70,5 @@ ggplot(ranked, aes(speaker, rank2)) +
     theme_classic() +
     theme(legend.position=1) + 
     labs(title="Most Characteristic Words & Phrases by Character") + 
-    xlab("") + ylab("Ranking") 
+    xlab("") + ylab("Ranking")  +
+    scale_y_continuous(breaks = c(25), labels = c("Highest"))
