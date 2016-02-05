@@ -5,9 +5,10 @@
 # located at http://www.imsdb.com/TV/South%20Park.html using the XML, stringr and 
 # RCurl packages. 
 ########################
-# Output: three large .csv files.
+# Input: none 
+########################
+# Output: 
 ### southpark_all_scripts.csv: each line of the transcript and its speaker, episode and episode number 
-### southpark_byepidsode_scripts.csv: combined text from each speaker by episode
 ### southpark_byperson_scripts.csv: combined text from each speaker across all episodes  
 ########################
 
@@ -75,24 +76,6 @@ for(h in 1:length(listing.f)) {
 }
 
 #write.csv(all.text, "southpark_all_scripts.csv", row.names=FALSE)
-
-# combine by speaker and episode
-
-by_episode <- NULL
-episodes <- unique(all$episode)
-for(episode in episodes){
-     subset <- all[all$episode==episode, ]
-     speakers <- unique(subset$speaker)
-     for(speaker in speakers){
-          subset2 <- subset[subset$speaker==speaker, ]
-          text <- str_c(subset2$words, collapse=" ")
-          row <- data.frame(episode, speaker, text)
-          by_episode <- rbind(by_episode, row)
-     }
-     
-}
-by_episode <- subset(by_episode, nchar(as.character(by_episode$text)) > 100)
-#write.csv(by_episode, "southpark_byepisode_scripts.csv", row.names=FALSE)
 
 # combine into speaker
 by_person <- NULL

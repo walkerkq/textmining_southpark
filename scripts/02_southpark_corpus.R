@@ -19,7 +19,7 @@ library(tm)
 library(RWeka)
 library(stringr)
 
-set.wd("/Users/kaylinwalker/R/textmining_southpark/raw data")
+setwd("/Users/kaylinwalker/R/textmining_southpark/raw data")
 by_person <- read.csv("southpark_byperson_scripts.csv", stringsAsFactors=FALSE)
 
 # keep the speakers with the most words, this keeps 23
@@ -32,7 +32,7 @@ other.text <- str_c(other.text$text, collapse=" ")
 other <- data.frame(speaker="ALL.OTHERS", text=other.text)
 
 # add it back in
-by_person2 <- rbind(by_person2, other)
+by_person2 <- rbind(by_person2, other); rm(by_person)
 
 # create corpus
 myReader <- readTabular(mapping=list(content="text", id="speaker"))
@@ -96,9 +96,6 @@ quad.tdm.85 <- removeSparseTerms(quad.tdm, 0.85)
 
 # save as a simple data frame
 count.quad.tdm <- data.frame(inspect(quad.tdm.85)) 
-# 90% sparse = 2,032 unique, 12,022 quadgrams
-# 80% sparse = 329 unique, 4401 quadgrams
-# 85% sparse = 741 unique, 6911 quadgrams **
 count.quad.tdm$word <- row.names(count.quad.tdm)
 
 

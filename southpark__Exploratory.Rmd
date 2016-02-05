@@ -10,6 +10,7 @@ library(knitr)
 library(stringr)
 library(ggplot2)
 library(RColorBrewer)
+library(ggrepel)
 opts_chunk$set(cache=TRUE, fig.width=10, fig.height=8, echo=FALSE)
 ```
 
@@ -25,8 +26,8 @@ ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
 
 main.speakers <- c("CARTMAN", "STAN", "KYLE", "KENNY", "RANDY", "BUTTERS", "MR..GARRISON")
 
-ngrams <- ngrams[ngrams$LL >= 10.83, ] # 1073 / 21106 = 5%
-ngrams.main <- ngrams[ngrams$speaker %in% main.speakers & ngrams$direction=="HIGH", ]
+ngrams <- ngrams[abs(ngrams$LL) >= 10.83, ] # 1073 / 21106 = 5%  // 1477/75552 = 1.9%
+ngrams.main <- ngrams[ngrams$speaker %in% main.speakers, ] # 732/1477 = 49.5%
 
 ## remove redundant ngrams like "you guys" vs. "you guys i" and "guys you guys"
 ngrams.norepeat <- ngrams[ngrams$ngram==1, ]
@@ -43,17 +44,17 @@ for(h in seq_along(bi)) {
 }
 ngrams.norepeat <- unique(ngrams.norepeat)
 
-ngrams.main.2 <- ngrams.norepeat[ngrams.norepeat$speaker %in% c("CARTMAN", "STAN", "KYLE", "KENNY")  & ngrams.norepeat$direction=="HIGH", ]
-ggplot(ngrams.main.2, aes(speaker, log(LL))) + 
+ngrams.main <- ngrams.main[ngrams.main$speaker %in% c( "KENNY"), ]
+ggplot(ngrams.main, aes(speaker, LL)) + 
      geom_point(color="white") + 
-     geom_text(aes(label=ngrams.main.2$word, size=log(ngrams.main.2$word.total), 
-                   color=ngrams.main.2$speaker), alpha=0.75) + 
+     geom_text_repel(aes(label=ngrams.main$word, fill=factor(speaker)),  
+                     box.padding = unit(0.25, "lines")) + 
      scale_size(range=c(5,10)) +
      scale_color_brewer(palette="Paired") +
      theme_classic() + 
      theme(axis.text.x = element_text(angle = 20, hjust = 1), legend.position=1) + 
      labs(title="Most Characteristic Words & Phrases by Character") + 
-     xlab("") + ylab("Log(Log Likelihood)")
+     xlab("") + ylab("Log(Log Likelihood)") 
 
 ```
 
