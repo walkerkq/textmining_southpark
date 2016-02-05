@@ -1,6 +1,6 @@
 ---
-title: "South Park Methodology"
-author: "Kaylin Walker • February 2, 2016"
+title: "Text Mining South Park for Characteristic Phrases"
+author: "Kaylin Walker • February 5, 2016"
 output: pdf_document
 ---
 
@@ -9,30 +9,30 @@ library(tm)
 library(knitr)
 library(stringr)
 library(ggplot2)
-opts_chunk$set(cache=TRUE, fig.width=10, echo=FALSE)
+opts_chunk$set(cache=FALSE, fig.width=10, echo=FALSE)
 
-#setwd("/Users/kwalker/git_projects/textmining_southpark/tidy data")
-setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data")
-ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
+setwd("/Users/kwalker/git_projects/textmining_southpark")
+#setwd("/Users/kaylinwalker/R/textmining_southpark")
+ngrams <- read.csv("tidy data/southpark_ngrams.csv", stringsAsFactors=FALSE)
 ```
 
-## Abstract    
+## Introduction      
 Quickly after Matt Stone and Trey Parker launched South Park, an adult animated series, in 1997, it became known for its use of crude language and dark satire of current events. Stone and Parker, the primary writers, producers and voice actors, have given the series a unique voice and personality. Each episode opens with the disclaimer:   
 
 > "All characters and events in this show—even those based on real people—are entirely fictional. All celebrity voices are impersonated.....poorly. The following program contains coarse language and due to its content it should not be viewed by anyone."   
 
 The series follows four main characters (Stan, Kyle, Cartman and Kenny), though it has an extensive ensemble cast of recurring characters. This analysis serves to analyze their speech to determine which words and phrases are distinct for each character. Since the series uses a lot of running gags, common phrases should be easy to find.  
 
-The programming language R and packages XML, RCurl, tm, RWeka and stringr were used to scrape South Park episode transcripts from the internet, attribute them to a certain character, break them into ngrams and identify chracteristic ngrams for each character.   
+The programming language R and packages XML, RCurl, tm, RWeka and stringr were used to scrape South Park episode transcripts from the internet, attribute them to a certain character, break them into ngrams and identify chracteristic ngrams for each character.    
 
 
 ## Method & Summary Statistics  
 Transcripts of the first 132 episodes of South Park (season 1 through season 9, episode 7) were scraped from unstructured text on the [Internet Movie Script Database](http://www.imsdb.com/TV/South%20Park.html) using the XML package. The series has run for 19 seasons and 267 episodes, but to my knowledge the remaining transcripts are not available online.   
 
-I was able to assign a speaker to each line by splitting the html at `<b>` tags that contained only uppercase text and were shorter than 40 characters. Each line was followed by a blank line, so I used their index to create a starting and stopping point for text to be attributed to a speaker. From there, I used the tm package to pre-process the text (to lowercase, remove punctuation, numbers and whitespace; remove stopwords for unigrams and bigrams, but left them in for tri-, 4- and 5-grams) and form a corpus, which contained more than 18,000 unique words spoken more than 211,000 times. Reducing the sparsity brought that down to about 2,300 words spoken 172,000 times. 
+I was able to assign a speaker to each line by splitting the html at `<b>` tags that contained only uppercase text and were shorter than 40 characters. Each line was followed by a blank line, so I used their index to create a starting and stopping point for text to be attributed to a speaker. From there, I used the tm package to pre-process the text (to lowercase, remove punctuation, numbers and whitespace; remove stopwords for unigrams and bigrams, but left them in for tri-, 4- and 5-grams) and form a corpus, which contained more than 18,000 unique words spoken more than 211,000 times. Reducing the sparsity brought that down to about 2,300 words spoken 172,000 times. Processing the text reduced it further to:  
 
 ```{r breakdown}
-count <- ngrams[ ,c(2,3,10)]
+count <- ngrams[ ,c(2,3,9)]
 count <- count[!duplicated(count),]
 counts <- aggregate(word.total ~ ngram, count, sum)
 unique <- data.frame(table(count$ngram)); rm(count)
@@ -67,7 +67,7 @@ kable(charsk, row.names=FALSE, caption="Number of Words by Character")
 ### Log Likelihood  
 Each corpus was analyzed to determine the most characteristic words for each speaker. Frequent and characteristic words are not the same thing - otherwise words like "I", "school", and "you" would rise to the top instead of unique words and phrases like "professor chaos", "hippies" and "you killed kenny." 
 
-Log likelihood was used to measure the unique-ness of the n-grams by character. Log likelihood compares the occurrence of a word in a particular corpus (the body of a character's speech) to its occurrence in another corpus (all of the remaining South Park text) to determine if it shows up more or less likely that expected. The returned value represents the likelihood that the corpora are from the same, larger corpus, like a t-test. The higher the score, the more unlikely.    
+Log likelihood was used to measure the unique-ness of the ngrams by character. Log likelihood compares the occurrence of a word in a particular corpus (the body of a character's speech) to its occurrence in another corpus (all of the remaining South Park text) to determine if it shows up more or less likely that expected. The returned value represents the likelihood that the corpora are from the same, larger corpus, like a t-test. The higher the score, the more unlikely.    
 
 The **chi-square test ($\chi^{2}$)**, or goodness-of-fit test, can be used to compare the occurrence of a word across corpora.  
 $$\chi^{2} = \sum \frac{(O_i-E_i)^{2}}{E_i}$$   
@@ -88,6 +88,8 @@ logtable <- data.frame(Group=c("Word", "Not Word", "Total"),
 kable(logtable, row.names=FALSE, caption="Basic Framework")
 ```
 
+  
+  
 ```{r}
 extable <- data.frame(Group=c("'hippies'", "Not 'hippies'", "Total"),
                        Cartmans.Text=c("36", "28170", "28206"),
@@ -97,13 +99,14 @@ kable(extable, row.names=FALSE, caption ="An Example with Log Likelihood 101.7")
 ```
 
 Computed:  
-E1 = 28206 * (41/172269) = 6.71
-E2 = 144063 * (41/172269) = 34.28  
-LL = 2 * [36 * log(36/6.71) + 5 * log(5/34.28) ] = 101.7  
+$E1 = 28206 * (41/172269) = 6.71$ & $E2 = 144063 * (41/172269) = 34.28$   
+$LL = 2 * [36 * log(36/6.71) + 5 * log(5/34.28) ] = 101.7$  
 
 Based on the overall ratio of the word "hippies" in the text, 41/172269 = 0.00023, we would expect to see hippies in Cartman's speech 6.71 times and in the remaining text 34.28 times. The log likelihood value of 101.7 is significant far beyond even the 0.01% level, so we can reject the null hypothesis that Cartman and the remaining text are one and the same.    
   
-For this analysis, a significance level of 0.001 was chosen to balance the number of significant ngrams with significance. 5.64% of ngrams were found to be significantly charcteristic of a certain character.  
+Only ngrams that passed a certan threshold were included in the log likelihood test; for unigrams, 50 occurences, for bigrams, 25, for tri-grams, 15, 4-grams, 10 and 5-grams 5. Each ngram was then compared to all speakers, including those who said it 0 times (using 0.0001 in place of 0 to prevent breaking the log step of the formula). If the number of times the speaker said the word was less than expected, the log likelihood was multiplied by -1 to produce a negative result.     
+  
+For this analysis, a significance level of 0.001 was chosen to balance the number of significant ngrams with significance. 1.31% of ngrams were found to be significantly charcteristic of a given character.  
 
 
 ```{r}
@@ -116,18 +119,25 @@ find_sig <- function(level) {
      return(sigpercent)
 }
 
-
 logl <- data.frame(Level=c("5%", "1%", "0.1%", "0.01%"),
                    Critical.Value=c(3.84, 6.63, 10.83, 15.13),
-                   P.Value=c("0.05", "0.01", ".001", ".0001"))
+                   p.Value=c("0.05", "0.01", "0.001", "0.0001"))
 for(h in 1:4) logl$Percent.Sig[h] <- find_sig(logl$Critical.Value[h])
 
 kable(logl, row.names=FALSE, caption="Log Likelihood Significance Levels")
 ```
-
-
-
   
+  
+The results were then filtered to include each word two times or less: once for the speaker most likely to say it (highest LL) and once for the speaker least likely to say it (lowest LL).  
+
+### Ranking    
+
+Finally, the results were ranked using the formula    
+$$LL * ngram.length$$  
+
+Ranking was used to condense the range of log likelihoods (-700 to 1000+). The ranking formula includes ngram length because longer ngrams appear fewer times in the text, leading to lower log likelihoods, but carry more semantic meaning.  
+  
+    
 ### References  
 Dunning, T. (1993) *Accurate Methods for the Statistics of Surprise and Coincidence.* Computational Linguistics, 19, 1, March 1993, pp. 61-74.   
 Kilgarriff. A. (1996) *Why chi-square doesn't work, and an improved LOB-Brown comparison.* ALLC-ACH Conference, June 1996, Bergen, Norway.  
