@@ -2,7 +2,7 @@
 # textmining_southpark
 ########################
 # R script to calculate the log likelihood of each ngram for each speaker compared to the rest 
-# of the text. 
+# of the text. Final filters each ngram to only a most a least likely speaker
 ########################
 # Input: (all created in 02_southpark_corpus.R, dependent on 01_southpark_scrape.R) 
 ### southpark_tdm.csv: data frame of term document matrix of unigrams
@@ -13,6 +13,7 @@
 ########################
 # Output: 
 ### southpark_ngrams.csv: contains ngram, log likelihood and associated figures for each speaker.  
+### southpark_ngrams_filtered.csv: filtered ngrams based on most/least likely speakers
 ########################
 
 library(tm)
@@ -101,3 +102,23 @@ quintLL$ngram <- 5
 southpark_ngrams <- rbind(uniLL, biLL, triLL, quadLL, quintLL)
 
 #write.csv(southpark_ngrams, "southpark_ngrams.csv", row.names=FALSE)
+ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
+
+# for each ngram, keep only the highest and lowest LL / reduce from 75552 to 1477 obs. 
+ngrams <- ngrams[abs(ngrams$LL) >= 10.83, ] 
+n.unique <- function(df){
+    ngrams.unique <- NULL
+    words <- unique(df$word)
+    for(h in seq_along(words)) {
+        subset <- df[df$word==words[h],]
+        if(length(subset[,1]) > 1) subset <- subset[order(-abs(subset$LL)), ]
+        ngrams.unique <- rbind(ngrams.unique, subset[1,])
+    } 
+    return(ngrams.unique)
+}
+ngrams.unique <- rbind(n.unique(ngrams[ngrams$LL >= 0, ]),
+                       n.unique(ngrams[ngrams$LL < 0, ]))
+
+
+#write.csv(ngrams.unique, "southpark_ngrams_filtered.csv", row.names=FALSE)
+
