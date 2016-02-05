@@ -102,10 +102,10 @@ quintLL$ngram <- 5
 southpark_ngrams <- rbind(uniLL, biLL, triLL, quadLL, quintLL)
 
 #write.csv(southpark_ngrams, "southpark_ngrams.csv", row.names=FALSE)
-ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
+#southpark_ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
 
 # for each ngram, keep only the highest and lowest LL / reduce from 75552 to 1477 obs. 
-ngrams <- ngrams[abs(ngrams$LL) >= 10.83, ] 
+ngrams <- southpark_ngrams[abs(southpark_ngrams$LL) >= 10.83, ] 
 n.unique <- function(df){
     ngrams.unique <- NULL
     words <- unique(df$word)
