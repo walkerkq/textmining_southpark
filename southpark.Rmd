@@ -17,19 +17,17 @@ ngrams <- read.csv("tidy data/southpark_ngrams.csv", stringsAsFactors=FALSE)
 ```
 
 ## Introduction      
-Quickly after Matt Stone and Trey Parker launched South Park, an adult animated series, in 1997, it became known for its use of crude language and dark satire of current events. Stone and Parker, the primary writers, producers and voice actors, have given the series a unique voice and personality. Each episode opens with the disclaimer:   
-
 > "All characters and events in this show—even those based on real people—are entirely fictional. All celebrity voices are impersonated.....poorly. The following program contains coarse language and due to its content it should not be viewed by anyone."   
 
-The series follows four main characters (Stan, Kyle, Cartman and Kenny), though it has an extensive ensemble cast of recurring characters. This analysis serves to analyze their speech to determine which words and phrases are distinct for each character. Since the series uses a lot of running gags, common phrases should be easy to find.  
+South Park, an adult animated television series, running 1991 through today, follows four main characters (Stan, Kyle, Cartman and Kenny) and an extensive ensemble cast of recurring characters. This analysis reviews their speech to determine which words and phrases are distinct for each character. Since the series uses a lot of running gags, common phrases should be easy to find.  
 
-The programming language R and packages XML, RCurl, tm, RWeka and stringr were used to scrape South Park episode transcripts from the internet, attribute them to a certain character, break them into ngrams and identify characteristic ngrams for each character. [Full scripts on Github.](https://github.com/walkerkq/textmining_southpark)      
+The programming language R and packages XML, RCurl, tm, RWeka and stringr were used to scrape South Park episode transcripts from the internet, attribute them to a certain character, break them into ngrams, calculate the log likelihood for each ngram/character pair, and rank them to create a list of most characteristic words/phrases for each character. [Full scripts on Github.](https://github.com/walkerkq/textmining_southpark)      
 
 
 ## Method & Summary Statistics  
 Transcripts of the first 132 episodes of South Park (season 1 through season 9, episode 7) were scraped from unstructured text on the [Internet Movie Script Database](http://www.imsdb.com/TV/South%20Park.html) using the XML package. The series has run for 19 seasons and 267 episodes, but to my knowledge the remaining transcripts are not available online.   
 
-I was able to assign a speaker to each line by splitting the html at `<b>` tags that contained only uppercase text and were shorter than 40 characters. Each line was followed by a blank line, so I used their index to create a starting and stopping point for text to be attributed to a speaker. From there, I used the tm package to pre-process the text (to lowercase, remove punctuation, numbers and white space; remove stop words for unigrams and bigrams, but left them in for tri-, 4- and 5-grams) and form a corpus, which contained more than 18,000 unique words spoken more than 211,000 times. Reducing the sparsity brought that down to about 2,300 words spoken 172,000 times. Processing the text reduced it further to:  
+I was able to assign a speaker to each line by splitting the html at `<b>` tags that contained only uppercase text and were shorter than 40 characters. Each line was followed by a blank line, so I used their index to create a starting and stopping point for text to be attributed to a speaker. From there, I used the tm package to pre-process the text (to lowercase, remove punctuation, numbers and white space; remove stop words) and form a corpus, which contained more than 18,000 unique words spoken more than 211,000 times. Reducing the sparsity brought that down to about 2,300 words spoken 172,000 times. Processing the text reduced it further to:  
 
 ```{r breakdown}
 count <- ngrams[ ,c(2,3,9)]

@@ -9,10 +9,10 @@
 ########################
 # Output: five  .csv files.
 ### southpark_tdm.csv: data frame of term document matrix of unigrams
-### southpark_bi_tdm_wstop.csv: data frame of term document matrix of bigrams, including stopwords
-### southpark_tri_tdm_wstop.csv: data frame of term document matrix of trigrams, including stopwords
-### southpark_quad_tdm_wstop.csv: data frame of term document matrix of 4-grams, including stopwords
-### southpark_quint_tdm_wstop.csv: data frame of term document matrix of 5-grams, including stopwords
+### southpark_bi_tdm.csv: data frame of term document matrix of bigrams
+### southpark_tri_tdm.csv: data frame of term document matrix of trigrams
+### southpark_quad_tdm.csv: data frame of term document matrix of 4-grams
+### southpark_quint_tdm.csv: data frame of term document matrix of 5-grams
 ########################
 
 library(tm)
@@ -44,13 +44,13 @@ corpus <- tm_map(corpus, content_transformer(tolower))
 corpus <- tm_map(corpus, content_transformer(removePunctuation), mc.cores=1)
 corpus <- tm_map(corpus, content_transformer(removeNumbers))
 corpus <- tm_map(corpus, content_transformer(stripWhitespace))
-corpus.stop.gone <- tm_map(corpus, removeWords, stopwords("english"))
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
 
 
 #################################### UNIGRAMS
 
 # create term document matrices
-corpus.tdm <- TermDocumentMatrix(corpus.stop.gone)
+corpus.tdm <- TermDocumentMatrix(corpus)
 # remove sparse terms
 tdm.80 <- removeSparseTerms(corpus.tdm, 0.8)
 
@@ -63,7 +63,7 @@ count.tdm$word <- row.names(count.tdm)
 
 options(mc.cores=1)
 BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
-bi.tdm <- TermDocumentMatrix(corpus.stop.gone, control = list(tokenize = BigramTokenizer))
+bi.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = BigramTokenizer))
 
 # remove sparse terms
 bi.tdm.80 <- removeSparseTerms(bi.tdm, 0.8)
@@ -76,7 +76,7 @@ count.bi.tdm$word <- row.names(count.bi.tdm)
 #################################### TRIGRAMS
 
 TrigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
-tri.tdm <- TermDocumentMatrix(corpus.stop.gone, control = list(tokenize = TrigramTokenizer))
+tri.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = TrigramTokenizer))
 
 # remove sparse terms
 tri.tdm.80 <- removeSparseTerms(tri.tdm, 0.80)
@@ -89,7 +89,7 @@ count.tri.tdm$word <- row.names(count.tri.tdm)
 #################################### 4-GRAMS
 
 QuadgramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 4, max = 4))
-quad.tdm <- TermDocumentMatrix(corpus.stop.gone, control = list(tokenize = QuadgramTokenizer))
+quad.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = QuadgramTokenizer))
 
 # remove sparse terms
 quad.tdm.80 <- removeSparseTerms(quad.tdm, 0.80)
@@ -102,7 +102,7 @@ count.quad.tdm$word <- row.names(count.quad.tdm)
 #################################### 5-GRAMS
 
 QuintgramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 5, max = 5))
-quint.tdm <- TermDocumentMatrix(corpus.stop.gone, control = list(tokenize = QuintgramTokenizer))
+quint.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = QuintgramTokenizer))
 
 # remove sparse terms
 quint.tdm.95 <- removeSparseTerms(quint.tdm, 0.95)
