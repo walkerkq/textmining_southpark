@@ -63,7 +63,7 @@ count.tdm$word <- row.names(count.tdm)
 
 options(mc.cores=1)
 BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
-bi.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = BigramTokenizer))
+bi.tdm <- TermDocumentMatrix(corpus.stop.gone, control = list(tokenize = BigramTokenizer))
 
 # remove sparse terms
 bi.tdm.80 <- removeSparseTerms(bi.tdm, 0.8)
@@ -76,7 +76,7 @@ count.bi.tdm$word <- row.names(count.bi.tdm)
 #################################### TRIGRAMS
 
 TrigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
-tri.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = TrigramTokenizer))
+tri.tdm <- TermDocumentMatrix(corpus.stop.gone, control = list(tokenize = TrigramTokenizer))
 
 # remove sparse terms
 tri.tdm.80 <- removeSparseTerms(tri.tdm, 0.80)
@@ -89,24 +89,24 @@ count.tri.tdm$word <- row.names(count.tri.tdm)
 #################################### 4-GRAMS
 
 QuadgramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 4, max = 4))
-quad.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = QuadgramTokenizer))
+quad.tdm <- TermDocumentMatrix(corpus.stop.gone, control = list(tokenize = QuadgramTokenizer))
 
 # remove sparse terms
-quad.tdm.85 <- removeSparseTerms(quad.tdm, 0.85)
+quad.tdm.80 <- removeSparseTerms(quad.tdm, 0.80)
 
 # save as a simple data frame
-count.quad.tdm <- data.frame(inspect(quad.tdm.85)) 
+count.quad.tdm <- data.frame(inspect(quad.tdm.80)) 
 count.quad.tdm$word <- row.names(count.quad.tdm)
 
 
 #################################### 5-GRAMS
 
 QuintgramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 5, max = 5))
-quint.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = QuintgramTokenizer))
+quint.tdm <- TermDocumentMatrix(corpus.stop.gone, control = list(tokenize = QuintgramTokenizer))
 
 # remove sparse terms
-quint.tdm.8 <- removeSparseTerms(quint.tdm, 0.8)
-count.quint.tdm <- data.frame(inspect(quint.tdm.8))
+quint.tdm.95 <- removeSparseTerms(quint.tdm, 0.95)
+count.quint.tdm <- data.frame(inspect(quint.tdm.95))
 sum(colSums(count.quint.tdm))
 count.quint.tdm$word <- row.names(count.quint.tdm)
 
@@ -114,9 +114,9 @@ count.quint.tdm$word <- row.names(count.quint.tdm)
 #################################### WRITE FILES
 
 #write.csv(count.tdm, "southpark_tdm.csv", row.names=FALSE)
-#write.csv(count.bi.tdm, "southpark_bi_tdm_wstop.csv", row.names=FALSE)
-#write.csv(count.tri.tdm, "southpark_tri_tdm_wstop.csv", row.names=FALSE)
-#write.csv(count.quad.tdm, "southpark_quad_tdm_wstop.csv", row.names=FALSE)
-#write.csv(count.quint.tdm, "southpark_quint_tdm_wstop.csv", row.names=FALSE)
+#write.csv(count.bi.tdm, "southpark_bi_tdm.csv", row.names=FALSE)
+#write.csv(count.tri.tdm, "southpark_tri_tdm.csv", row.names=FALSE)
+#write.csv(count.quad.tdm, "southpark_quad_tdm.csv", row.names=FALSE)
+#write.csv(count.quint.tdm, "southpark_quint_tdm.csv", row.names=FALSE)
 
 

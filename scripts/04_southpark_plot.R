@@ -18,9 +18,9 @@ library(RColorBrewer)
 #source("02_southpark_corpus.R") 
 #source("03_southpark_loglikelihood.R") 
 
-setwd("/Users/kwalker/git_projects/textmining_southpark/tidy data")
-#setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data")
-ngrams <- read.csv("southpark_ngrams_filtered.csv", stringsAsFactors=FALSE)
+#setwd("/Users/kwalker/git_projects/textmining_southpark/tidy data/")
+setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data")
+ngrams <- read.csv("southpark_ngrams_filtered_nostop.csv", stringsAsFactors=FALSE)
 
 # keep just main speakers 
 main.speakers <- c("CARTMAN", "STAN", "KYLE", "KENNY", "RANDY", 

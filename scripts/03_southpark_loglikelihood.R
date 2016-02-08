@@ -21,10 +21,10 @@ library(stringr)
 
 setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data/tdm/")
 count.tdm <- read.csv("southpark_tdm.csv", stringsAsFactors=FALSE)
-count.bi.ws.tdm <- read.csv("southpark_bi_tdm_wstop.csv", stringsAsFactors=FALSE)
-count.tri.ws.tdm <- read.csv("southpark_tri_tdm_wstop.csv", stringsAsFactors=FALSE)
-count.quad.ws.tdm <- read.csv("southpark_quad_tdm_wstop.csv", stringsAsFactors=FALSE)
-count.quint.ws.tdm <- read.csv("southpark_quint_tdm_wstop.csv", stringsAsFactors=FALSE)
+count.bi.ws.tdm <- read.csv("southpark_bi_tdm.csv", stringsAsFactors=FALSE)
+count.tri.ws.tdm <- read.csv("southpark_tri_tdm.csv", stringsAsFactors=FALSE)
+count.quad.ws.tdm <- read.csv("southpark_quad_tdm.csv", stringsAsFactors=FALSE)
+count.quint.ws.tdm <- read.csv("southpark_quint_tdm.csv", stringsAsFactors=FALSE)
 
 ################################### DEFINE FUNCTIONS
 
@@ -101,7 +101,7 @@ quadLL$ngram <- 4
 quintLL$ngram <- 5
 southpark_ngrams <- rbind(uniLL, biLL, triLL, quadLL, quintLL)
 
-#write.csv(southpark_ngrams, "southpark_ngrams.csv", row.names=FALSE)
+#write.csv(southpark_ngrams, "southpark_ngrams_nostop.csv", row.names=FALSE)
 #southpark_ngrams <- read.csv("southpark_ngrams.csv", stringsAsFactors=FALSE)
 
 # for each ngram, keep only the highest and lowest LL / reduce from 75552 to 1477 obs. 
@@ -120,5 +120,5 @@ ngrams.unique <- rbind(n.unique(ngrams[ngrams$LL >= 0, ]),
                        n.unique(ngrams[ngrams$LL < 0, ]))
 
 
-#write.csv(ngrams.unique, "southpark_ngrams_filtered.csv", row.names=FALSE)
+#write.csv(ngrams.unique, "southpark_ngrams_filtered_nostop.csv", row.names=FALSE)
 

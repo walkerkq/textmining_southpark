@@ -8,13 +8,17 @@
 # Input: none 
 ########################
 # Output: 
-### southpark_all_scripts.csv: each line of the transcript and its speaker, episode and episode number 
+### southpark_all_scripts.csv: each line of the transcript and its speaker, episode and episode number
+### southpark_byepisode_scripts.csv: combined text from each speaker in each episode
 ### southpark_byperson_scripts.csv: combined text from each speaker across all episodes  
 ########################
 
 library("RCurl")
 library("XML")
 library("stringr")
+
+# set directory
+setwd("/Users/kaylinwalker/R/textmining_southpark/")
 
 # get list of episodes
 URL <- "http://www.imsdb.com/TV/South%20Park.html"
@@ -76,6 +80,23 @@ for(h in 1:length(listing.f)) {
 }
 
 #write.csv(all.text, "southpark_all_scripts.csv", row.names=FALSE)
+all.text$episode.order <- paste(all.text$num, all.text$episode, sep=" ")
+
+### by speaker and by episode
+by_episode <- NULL
+episodes <- unique(all.text$episode.order)
+for(episode in episodes) {
+     subset <- all.text[all.text$episode.order==episode, ]
+     speakers <- unique(subset$speaker)
+     for(speaker in speakers) {
+          subset2 <- subset[subset$speaker==speaker, ]
+          text <- str_c(subset2$words, collapse=" ")
+          row <- data.frame(episode, speaker, text)
+          by_episode <- rbind(by_episode, row)
+     }
+}
+
+#write.csv(by_episode, "southpark_byepisode_scripts.csv", row.names=FALSE)
 
 # combine into speaker
 by_person <- NULL
@@ -108,3 +129,7 @@ by_person <- by_person[(by_person$speaker!="KYLE TWO"), ]
 by_person <- rbind(by_person, data.frame(speaker="KYLE", text=mfix))
 
 #write.csv(by_person, "southpark_byperson_scripts.csv", row.names=FALSE)
+
+
+
+
