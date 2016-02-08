@@ -19,7 +19,9 @@
 library(tm)
 library(stringr)
 
-setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data/tdm/")
+#setwd("/Users/kaylinwalker/R/textmining_southpark/tidy data/tdm/")
+setwd("/Users/kwalker/git_projects/textmining_southpark/tidy data/tdm/")
+
 count.tdm <- read.csv("southpark_tdm.csv", stringsAsFactors=FALSE)
 count.bi.tdm <- read.csv("southpark_bi_tdm.csv", stringsAsFactors=FALSE)
 count.tri.tdm <- read.csv("southpark_tri_tdm.csv", stringsAsFactors=FALSE)
@@ -86,10 +88,10 @@ LL_pass <- function(df, threshold) {
 ################################### RUN
 
 system.time(uniLL <- LL_pass(count.tdm, 50)) # 173.1s
-system.time(biLL <- LL_pass(count.bi.ws.tdm, 25)) # 618.3s
-system.time(triLL <- LL_pass(count.tri.ws.tdm, 15)) # 138.2s
-system.time(quadLL <- LL_pass(count.quad.ws.tdm, 10)) # 35.2s
-system.time(quintLL <- LL_pass(count.quint.ws.tdm, 5)) # 23.3s
+system.time(biLL <- LL_pass(count.bi.tdm, 25)) # 618.3s
+system.time(triLL <- LL_pass(count.tri.tdm, 15)) # 138.2s
+system.time(quadLL <- LL_pass(count.quad.tdm, 10)) # 35.2s
+system.time(quintLL <- LL_pass(count.quint.tdm, 5)) # 23.3s
 
 
 #################################### COMBINE

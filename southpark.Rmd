@@ -17,7 +17,7 @@ ngrams <- read.csv("tidy data/southpark_ngrams.csv", stringsAsFactors=FALSE)
 ```
 
 ## Introduction      
-> "All characters and events in this show—even those based on real people—are entirely fictional. All celebrity voices are impersonated.....poorly. The following program contains coarse language and due to its content it should not be viewed by anyone."   
+> "All characters and events in this show—even those based on real people—are entirely fictional. All celebrity voices are impersonated...poorly. The following program contains coarse language and due to its content it should not be viewed by anyone." *- South Park disclaimer*     
 
 South Park, an adult animated television series, running 1991 through today, follows four main characters (Stan, Kyle, Cartman and Kenny) and an extensive ensemble cast of recurring characters. This analysis reviews their speech to determine which words and phrases are distinct for each character. Since the series uses a lot of running gags, common phrases should be easy to find.  
 

@@ -389,7 +389,8 @@
 "ALL.OTHERS","oh dear",41,5635,27,14.8881943549426,26.1118056450574,14.6912420148046,2
 "ALL.OTHERS","right yeah",33,5635,22,11.9831808222709,21.0168191777291,12.4882782673728,2
 "ALL.OTHERS","im sorry",168,5635,82,61.0052841861065,106.994715813894,10.934106621535,2
-"MEPHESTO","learned something today",25,0,0,0,25,Inf,3
+"MEPHESTO","god killed kenny",27,0,0,0,27,Inf,3
+"MEPHESTO","oh god killed",28,0,0,0,28,Inf,3
 "MEPHESTO","wait wait wait",21,0,0,0,21,Inf,3
 "MEPHESTO","kathie lee gifford",18,0,0,0,18,Inf,3
 "MEPHESTO","south park elementary",20,0,0,0,20,Inf,3
@@ -399,11 +400,13 @@
 "MEPHESTO","come lets go",22,0,0,0,22,Inf,3
 "MEPHESTO","dont even know",23,0,0,0,23,Inf,3
 "MEPHESTO","dont know youre",16,0,0,0,16,Inf,3
+"MEPHESTO","god oh god",16,0,0,0,16,Inf,3
 "MEPHESTO","ha ha ha",77,0,0,0,77,Inf,3
 "MEPHESTO","hey wait minute",20,0,0,0,20,Inf,3
 "MEPHESTO","im gonna get",18,0,0,0,18,Inf,3
 "MEPHESTO","ive ever seen",21,0,0,0,21,Inf,3
 "MEPHESTO","ive never seen",17,0,0,0,17,Inf,3
+"MEPHESTO","learned something today",25,0,0,0,25,Inf,3
 "MEPHESTO","now im gonna",16,0,0,0,16,Inf,3
 "MEPHESTO","oh god oh",26,0,0,0,26,Inf,3
 "MEPHESTO","oh im sorry",19,0,0,0,19,Inf,3
@@ -412,8 +415,12 @@
 "MEPHESTO","well looks like",18,0,0,0,18,Inf,3
 "MEPHESTO","weve gotta get",21,0,0,0,21,Inf,3
 "MEPHESTO","youre gonna get",22,0,0,0,22,Inf,3
+"CHEF","god theyve killed kenny",14,0,0,0,14,Inf,4
+"CHEF","oh god theyve killed",18,0,0,0,18,Inf,4
+"CHEF","oh god killed kenny",26,0,0,0,26,Inf,4
 "CHEF","ha ha ha ha",52,0,0,0,52,Inf,4
 "CHEF","ive learned something today",13,0,0,0,13,Inf,4
+"CHEF","oh god oh god",15,0,0,0,15,Inf,4
 "CHEF","oh god theyve killed kenny",14,0,0,0,14,Inf,5
 "CHEF","ausrotten wir mü¾¼ssen die juden",6,0,0,0,6,Inf,5
 "CHEF","die juden ausrotten wir mü¾¼ssen",6,0,0,0,6,Inf,5
@@ -621,7 +628,12 @@
 "ALL.OTHERS","guys im",42,5635,3,15.2513210465266,26.7486789534734,-19.6556485762597,2
 "ALL.OTHERS","best friend",38,5635,2,13.7988142801907,24.2011857198093,-20.8667043613896,2
 "ALL.OTHERS","come guys",61,5635,4,22.150728186622,38.849271813378,-30.010652479653,2
-"STAN","ha ha ha",77,56,0,8,69,-16.8913753011066,3
-"KYLE","ha ha ha ha",52,7,0,5.6,46.4,-11.8480163509247,4
-"ALL.OTHERS","ive learned something today",13,40,2,8,5,-11.8008844835344,4
+"STAN","ha ha ha",77,94,0,11.8655737704918,65.1344262295082,-25.7699007232885,3
+"ALL.OTHERS","oh god killed",28,235,3,10.7868852459016,17.2131147540984,-10.9818996235938,3
+"ALL.OTHERS","god killed kenny",27,235,2,10.4016393442623,16.5983606557377,-13.8833295333561,3
+"STAN","oh god oh god",15,48,0,5.21739130434783,9.78260869565217,-12.8211479772284,4
+"STAN","ha ha ha ha",52,48,0,18.0869565217391,33.9130434782609,-44.4517564357185,4
+"ALL.OTHERS","oh god killed kenny",26,50,2,9.42028985507246,16.5797101449275,-11.5550851133323,4
+"ALL.OTHERS","god theyve killed kenny",14,50,0,5.07246376811594,8.92753623188406,-12.5955055456076,4
+"ALL.OTHERS","oh god theyve killed",18,50,0,6.52173913043478,11.4782608695652,-16.1947902481539,4
 "ALL.OTHERS","oh god theyve killed kenny",14,59,0,8.69473684210526,5.30526315789474,-27.1677480763933,5

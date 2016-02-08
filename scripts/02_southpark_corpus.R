@@ -19,7 +19,8 @@ library(tm)
 library(RWeka)
 library(stringr)
 
-setwd("/Users/kaylinwalker/R/textmining_southpark/raw data")
+#setwd("/Users/kaylinwalker/R/textmining_southpark/raw data")
+setwd("/Users/kwalker/git_projects/textmining_southpark/raw data")
 by_person <- read.csv("southpark_byperson_scripts.csv", stringsAsFactors=FALSE)
 
 # keep the speakers with the most words, this keeps 23
@@ -79,10 +80,10 @@ TrigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3)
 tri.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = TrigramTokenizer))
 
 # remove sparse terms
-tri.tdm.80 <- removeSparseTerms(tri.tdm, 0.80)
+tri.tdm.85 <- removeSparseTerms(tri.tdm, 0.85)
 
 # save as a simple data frame
-count.tri.tdm <- data.frame(inspect(tri.tdm.80)) 
+count.tri.tdm <- data.frame(inspect(tri.tdm.85)) 
 count.tri.tdm$word <- row.names(count.tri.tdm)
 
 
@@ -92,10 +93,10 @@ QuadgramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 4, max = 4
 quad.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = QuadgramTokenizer))
 
 # remove sparse terms
-quad.tdm.80 <- removeSparseTerms(quad.tdm, 0.80)
+quad.tdm.95 <- removeSparseTerms(quad.tdm, 0.95)
 
 # save as a simple data frame
-count.quad.tdm <- data.frame(inspect(quad.tdm.80)) 
+count.quad.tdm <- data.frame(inspect(quad.tdm.95)) 
 count.quad.tdm$word <- row.names(count.quad.tdm)
 
 
