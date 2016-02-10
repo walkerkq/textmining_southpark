@@ -25,12 +25,14 @@ mycolors <- c("#666666", "#C20631", "#673e1e",  "#21B726", "#266E35", "#5BE1C6")
 wordshare <- ggplot(total, aes(group,share)) + 
      geom_bar(stat="identity", aes(fill=speaker)) +
      theme_classic() + labs(title="Cartman Talks the Most") + 
-     ylab("Share of Words Spoken per Episode (Avg. %)") + 
+     ylab("Share of Words Spoken (Episode Avg. %)") + 
      scale_fill_manual(values = mycolors[1:6]) + xlab("") +
      theme(legend.position=1,plot.title = element_text(size=18), 
-           axis.title.y=element_text(margin=margin(0,10,0,0))) +
+           axis.title.y=element_text(margin=margin(0,10,0,0)),
+           axis.title=element_text(size=16)) +
      geom_text(aes(x=group, y=cumsum(share)-share*0.5, 
                    label=paste(speaker,": ",share,"%", sep="")), 
                color="white", fontface="bold", size=4)
-dev.copy(png, 'plots/southpark_wordshare_plot.png')
-dev.off()
+
+#dev.copy(png, 'plots/southpark_wordshare_plot.png')
+#dev.off()

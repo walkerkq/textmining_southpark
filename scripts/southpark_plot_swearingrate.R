@@ -38,14 +38,16 @@ swearing <- ggplot(totes, aes(speaker, swear.rate*1000)) +
      labs(title="Kenny Swears at the Highest Rate") + 
      ylab("Profanities per 1000 Words") + 
      xlab("") + 
-     annotate("text", x=11, y=(overall*1000)+1, label="Average") + 
+     annotate("text", x=11, y=(overall*1000)+1, label="Average", size=5) + 
      scale_fill_manual(values = mycolors) +
      geom_text(aes(x=speaker, y=(swear.rate*1000)-2, label=swear.rate*1000), 
                color="white", fontface="bold", size=6) + 
      theme(legend.position=1,plot.title = element_text(size=20), 
            axis.title.y=element_text(margin=margin(0,10,0,0)),
-           axis.text.x = element_text(angle = 15, hjust = 1, size=12))
+           axis.text.x = element_text(angle = 15, hjust = 1, size=14),
+           axis.text.y = element_text(size=14),
+           axis.title=element_text(size=16))
 
-dev.copy(png, 'plots/southpark_swearsalot_plot.png')
-dev.off()
+#dev.copy(png, 'plots/southpark_swearsalot_plot.png')
+#dev.off()
 

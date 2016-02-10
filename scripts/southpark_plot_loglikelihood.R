@@ -4,76 +4,73 @@ library(png)
 library(grid)
 
 setwd("/Users/kaylinwalker/R/textmining_southpark/")
-count.all <- read.csv("tidy data/southpark_tdm_all.csv", stringsAsFactors=FALSE)
+count.all <- read.csv("data/tidy data/southpark_tdm_all.csv", stringsAsFactors=FALSE)
 
 # function to get the log likelihood of each of a 
 # speaker's words vs. the rest of the dataframe
-LL.all <- function(df, speaker) {
+LL <- function(df, threshold, sig.level) {
      
      LL.df <- NULL
      
-     for(word in seq_along(df[,1])) {
+     df <- df[rowSums(df[ , -length(df[1,])]) > threshold, ]
+     
+     people <- colnames(df[ , -length(df[1,])])
+     
+     for(speaker in people) {
           
-          word <- df$word[word]
-          
-          speaker.sums <- data.frame(speaker = names(colSums(df[,1:28])) , total=colSums(df[,1:28]), row.names=NULL)
-          word.sums <- data.frame(word = df$word , total=rowSums(df[ ,1:28]), row.names=NULL)
-          all.words.total <- sum(speaker.sums$total)
-          
-          word.total <- word.sums[word.sums$word==word, 2]
-          
-          speaker.total <- speaker.sums[speaker.sums$speaker==speaker, 2]
-          if(speaker.total == 0) speaker.total <- 0.0001
-          other.total <- all.words.total - speaker.total
-          
-          speaker.word <- df[df$word==word, ]
-          speaker.word <- data.frame(speaker=names(speaker.word), count=t(speaker.word), row.names=NULL)
-          speaker.word <- as.numeric(as.character(speaker.word[speaker.word$speaker==speaker, 2]))
-          other.word <- word.total - speaker.word
-          
-          if(speaker.word == 0) speaker.word <- 0.0001
-          E1 <- (speaker.total*word.total)/all.words.total
-          E2 <- (other.total*word.total)/all.words.total
-          LL <- 2*(speaker.word*log(speaker.word/E1) + other.word*log(other.word/E2))
-          
-          if(abs(LL) > 10.83) {
-               if(E1 > speaker.word) LL <- -1*LL
-               speaker.word <- round(speaker.word)
-               speaker.total <- round(speaker.total)
-               row <- data.frame(speaker, word, word.total, speaker.total, speaker.word, E1, E2, LL)
-               LL.df <- rbind(LL.df, row)
-          }
-          
-     }
-     LL.df <- LL.df[order(-LL.df$LL), ]
-     return(LL.df)
-}
-
-# create a staging function to pass a speaker at a time through the LL function
-LL_pass <- function(df, threshold) {
-     output <- NULL     
-     df <- df[rowSums(df[,1:28]) > threshold, ]
-     people <- colnames(df[,c(1:(length(df[1,])-1))])
-     for(person in people) {
-          temp.p <- subset(df, select=person)
+          # subset the data frame to hold one speaker's data
+          temp.p <- subset(df, select=speaker)
           temp.count <- subset(df, select=word)
           temp.w <- cbind(temp.p, temp.count)
-          temp <- LL.all(df=df, speaker=person)
-          output <- rbind(output, temp)
+     
+          # loop through their words
+          for(k in seq_along(temp.w[,1])) {
+               
+               word <- temp.w$word[k]
+               
+               speaker.sums <- data.frame(speaker = names(colSums(df[ , -length(df[1,])])), total=colSums(df[ , -length(df[1,])]), row.names=NULL)
+               word.sums <- data.frame(word = df$word , total=rowSums(df[ , -length(df[1,])]), row.names=NULL)
+               all.words.total <- sum(speaker.sums$total)
+               
+               word.total <- word.sums[word.sums$word==word, 2]
+               
+               speaker.total <- speaker.sums[speaker.sums$speaker==speaker, 2]
+               if(speaker.total == 0) speaker.total <- 0.0001
+               other.total <- all.words.total - speaker.total
+               
+               speaker.word <- df[df$word==word, ]
+               speaker.word <- data.frame(speaker=names(speaker.word), count=t(speaker.word), row.names=NULL)
+               speaker.word <- as.numeric(as.character(speaker.word[speaker.word$speaker==speaker, 2]))
+               other.word <- word.total - speaker.word
+               
+               if(speaker.word == 0) speaker.word <- 0.0001
+               E1 <- (speaker.total*word.total)/all.words.total
+               E2 <- (other.total*word.total)/all.words.total
+               LL <- 2*(speaker.word*log(speaker.word/E1) + other.word*log(other.word/E2))
+               
+               if(abs(LL) > sig.level) {
+                    if(E1 > speaker.word) LL <- -1*LL
+                    speaker.word <- round(speaker.word)
+                    speaker.total <- round(speaker.total)
+                    row <- data.frame(speaker, word, word.total, speaker.total, speaker.word, E1, E2, LL)
+                    LL.df <- rbind(LL.df, row)
+               }
+               
+          }
      }
-     return(output)
+     LL.df <- LL.df[order(LL.df$speaker, -LL.df$LL), ]
+     return(LL.df)
 }
 
 # pass the words through the log likelihood function
 #### FYI: this takes a while.
-allLL <- LL_pass(count.all, 25)
+allLL <- LL(count.all, threshold=25, sig.level=10.83)
 
 ### save the file for easy later access.
 #write.csv(allLL, "data/tidy data/southpark_ngrams.csv", row.names=FALSE)
 #allLL <- read.csv("data/tidy data/southpark_ngrams.csv", stringsAsFactors=FALSE)
 
 # for each ngram, keep only the highest and lowest LL  
-ngrams <- allLL[abs(allLL$LL) >= 10.83, ] 
 n.unique <- function(df){
      ngrams.unique <- NULL
      words <- unique(df$word)
@@ -84,8 +81,8 @@ n.unique <- function(df){
      } 
      return(ngrams.unique)
 }
-ngrams.unique <- rbind(n.unique(ngrams[ngrams$LL >= 0, ]),
-                       n.unique(ngrams[ngrams$LL < 0, ]))
+ngrams.unique <- rbind(n.unique(allLL[allLL$LL >= 0, ]),
+                       n.unique(allLL[allLL$LL < 0, ]))
 
 
 # keep just main speakers 
@@ -142,5 +139,5 @@ ggplot(ranked, aes(speaker, ((rank2*-1)-4))) +
      annotation_custom(butters, xmin=4.5, xmax=5.5, ymin=0, ymax=-4) + 
      annotation_custom(randy, xmin=5.5, xmax=6.5, ymin=0, ymax=-4) 
 
-dev.copy(png, 'plots/southpark_ranked_plot.png')
-dev.off()
+#dev.copy(png, 'plots/southpark_ranked_plot.png')
+#dev.off()

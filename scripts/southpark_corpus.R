@@ -13,6 +13,7 @@ if(file.exists("all-seasons.csv")) {
 }
 
 # condense to get rid of season / episode
+scripts$Character <- gsub("Mrs. Garrison", "Mr. Garrison", scripts$Character) # combine Garrisons
 by.speaker <- NULL
 for(speaker in unique(scripts$Character)){
      subset <- scripts[scripts$Character==speaker, ]
@@ -23,7 +24,7 @@ for(speaker in unique(scripts$Character)){
 
 # condense low-volume speakers into one to create a manageable corpus
 # this keeps 27
-by.speaker.big <- by.speaker[nchar(as.character(by.speaker$text)) > 15000, ]
+by.speaker.big <- by.speaker[nchar(as.character(by.speaker$text)) > 14500, ]
 
 # save the rest of the text into one big speaker "All others"
 kept.speakers <- unique(as.character(by.speaker.big$speaker))
@@ -52,7 +53,7 @@ allTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 1, max = 3))
 all.tdm <- TermDocumentMatrix(corpus, control = list(tokenize = allTokenizer))
 
 # remove sparse terms
-all.tdm.75 <- removeSparseTerms(all.tdm, 0.75) # 3105 / 728214
+all.tdm.75 <- removeSparseTerms(all.tdm, 0.75) # 3117 / 728215
 
 # save as a simple data frame
 count.all <- data.frame(inspect(all.tdm.75)) 

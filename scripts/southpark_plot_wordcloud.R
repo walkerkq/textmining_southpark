@@ -12,5 +12,5 @@ findFreq <- function(df){
 freq1 <- findFreq(count.all)
 cloud <- wordcloud(freq1$word, freq1$total, scale=c(2.5,0.5), min.freq=100, max.words=200, random.order=FALSE)
 
-dev.copy(png,'plots/southpark_wordcloud.png')
-dev.off()
+#dev.copy(png,'plots/southpark_wordcloud.png')
+#dev.off()
