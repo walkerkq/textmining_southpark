@@ -1,7 +1,7 @@
 ---
 title: "Text Mining South Park for Characteristic Phrases"
-author: "Kaylin Walker • February 5, 2016"
-output: html_document
+author: "Kaylin Walker • February 9, 2016"
+output: pdf_document
 ---
 
 ```{r opts, warning=FALSE, message=FALSE, echo=FALSE}
@@ -11,53 +11,41 @@ library(stringr)
 library(ggplot2)
 opts_chunk$set(cache=FALSE, fig.width=10, echo=FALSE)
 
-setwd("/Users/kwalker/git_projects/textmining_southpark")
-#setwd("/Users/kaylinwalker/R/textmining_southpark")
-ngrams <- read.csv("tidy data/southpark_ngrams.csv", stringsAsFactors=FALSE)
+setwd("/Users/kaylinwalker/Desktop/textmining_southpark_2/")
+ngrams <- read.csv("data/tidy data/southpark_ngrams.csv", stringsAsFactors=FALSE)
 ```
 
 ## Introduction      
 > "All characters and events in this show—even those based on real people—are entirely fictional. All celebrity voices are impersonated...poorly. The following program contains coarse language and due to its content it should not be viewed by anyone." *- South Park disclaimer*     
 
-South Park, an adult animated television series, running 1991 through today, follows four main characters (Stan, Kyle, Cartman and Kenny) and an extensive ensemble cast of recurring characters. This analysis reviews their speech to determine which words and phrases are distinct for each character. Since the series uses a lot of running gags, common phrases should be easy to find.  
+South Park, an adult animated television series, running 1997 through today, follows four main characters (Stan, Kyle, Cartman and Kenny) and an extensive ensemble cast of recurring characters. This analysis reviews their speech to determine which words and phrases are distinct for each character. Since the series uses a lot of running gags, common phrases should be easy to find.  
 
-The programming language R and packages XML, RCurl, tm, RWeka and stringr were used to scrape South Park episode transcripts from the internet, attribute them to a certain character, break them into ngrams, calculate the log likelihood for each ngram/character pair, and rank them to create a list of most characteristic words/phrases for each character. [Full scripts on Github.](https://github.com/walkerkq/textmining_southpark)      
+The programming language R and packages tm, RWeka and stringr were used to scrape South Park episode transcripts from the internet, attribute them to a certain character, break them into ngrams, calculate the log likelihood for each ngram/character pair, and rank them to create a list of most characteristic words/phrases for each character. The results were visualized using ggplot2, wordcloud and RColorBrewer. [Full scripts on Github.](https://github.com/walkerkq/textmining_southpark)      
 
 
 ## Method & Summary Statistics  
-Transcripts of the first 132 episodes of South Park (season 1 through season 9, episode 7) were scraped from unstructured text on the [Internet Movie Script Database](http://www.imsdb.com/TV/South%20Park.html) using the XML package. The series has run for 19 seasons and 267 episodes, but to my knowledge the remaining transcripts are not available online.   
+Complete transcripts (70,000 lines amounting to 5.5 MB) were downloaded from [BobAdamsEE's github repository SouthParkData](https://github.com/BobAdamsEE/SouthParkData) from the original source at the [South Park Wikia page](http://southpark.wikia.com/wiki/Portal:Scripts).  
+  
+I used the stringr package to condense each speaker's text into one large unformatted string. From there, I used the tm package to pre-process the text (to lowercase, remove punctuation, numbers and white space; remove stop words) and form a corpus, which contained more than 30,600 unique words spoken more than 836,000 times. Reducing the sparsity brought that down to about 3,100 unique words. Processing the text reduced it further to our final subset of roughly 1,000 unique words and phrases. 
 
-I was able to assign a speaker to each line by splitting the html at `<b>` tags that contained only uppercase text and were shorter than 40 characters. Each line was followed by a blank line, so I used their index to create a starting and stopping point for text to be attributed to a speaker. From there, I used the tm package to pre-process the text (to lowercase, remove punctuation, numbers and white space; remove stop words) and form a corpus, which contained more than 18,000 unique words spoken more than 211,000 times. Reducing the sparsity brought that down to about 2,300 words spoken 172,000 times. Processing the text reduced it further to:  
-
-```{r breakdown}
-count <- ngrams[ ,c(2,3,9)]
-count <- count[!duplicated(count),]
-counts <- aggregate(word.total ~ ngram, count, sum)
-unique <- data.frame(table(count$ngram)); rm(count)
-counts <- cbind(counts, unique[,2])
-colnames(counts) <- c("ngram.size", "total", "unique")
-kable(counts, row.names=FALSE)
-```
-
-23 characters with the most words were retained, and the remaining 1781 speakers combined into one "all others" category so as not to lose the text. 
+29 characters with the most words were retained, and the remaining 3,958 speakers combined into one "all others" category so as not to lose the text. 
 
 ```{r characters}
-unigrams <- ngrams[ngrams$ngram==1, ]
-characters <- unique(unigrams$speaker)
+characters <- unique(ngrams$speaker)
 chars <- NULL
 for(character in characters){
-     b <- unigrams[unigrams$speaker==character, ]
+     b <- ngrams[ngrams$speaker==character, ]
      b <- b[1, c(1,4)]
      chars <- rbind(chars, b)
 }
 total <- sum(chars$speaker.total)
 chars$word.share <- round(chars$speaker.total/total,2)
 chars <- chars[order(-chars$speaker.total), ]
-chars <- chars[c(2:24,1),]
+chars <- chars[c(2:27,1),]
 chars$speaker <- factor(chars$speaker, levels=chars$speaker)
 colnames(chars) <- c("speaker", "words")
 chars$speaker <- tolower(chars$speaker)
-charsk <- cbind(chars[1:8,1:2], chars[9:16,1:2], chars[17:24,1:2])
+charsk <- cbind(chars[1:9,1:2], chars[10:18,1:2], chars[19:27,1:2])
 kable(charsk, row.names=FALSE, caption="Number of Words by Character")
 ```
   
