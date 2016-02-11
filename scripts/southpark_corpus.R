@@ -7,7 +7,7 @@ setwd("/Users/kaylinwalker/R/textmining_southpark/data/raw data")
 if(file.exists("all-seasons.csv")) {
      scripts <- read.csv("all-seasons.csv", stringsAsFactors=FALSE)
 } else { 
-     url <- "https://raw.github.com/BobAdamsEE/SouthParkData/master/All-seasons.csv"
+     url <- "https://raw.githubusercontent.com/BobAdamsEE/SouthParkData/master/All-seasons.csv"
      scripts <- download.file(url, "all-seasons.csv", method="curl")
      scripts <- read.csv("all-seasons.csv", stringsAsFactors=FALSE)
 }
