@@ -2,7 +2,7 @@ library(ggplot2)
 library(RColorBrewer)
 
 setwd("/Users/kaylinwalker/R/textmining_southpark/")
-count.all <- read.csv("data/tidy data/southpark_tdm_all.csv", stringsAsFactors=FALSE)
+count.all <- read.csv("data/tidy data/southpark_tdm_speaker.csv", stringsAsFactors=FALSE)
 
 totals <- rbind(names(count.all[,1:28]), colSums(count.all[,1:28]))
 total <- data.frame(t(totals))

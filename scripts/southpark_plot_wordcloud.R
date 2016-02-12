@@ -1,7 +1,7 @@
 library(wordcloud)
 
 setwd("/Users/kaylinwalker/R/textmining_southpark/")
-count.all <- read.csv("data/tidy data/southpark_tdm_all.csv", stringsAsFactors=FALSE)
+count.all <- read.csv("data/tidy data/southpark_tdm_speaker.csv", stringsAsFactors=FALSE)
 
 findFreq <- function(df){
      df$total <- rowSums(df[,1:28])

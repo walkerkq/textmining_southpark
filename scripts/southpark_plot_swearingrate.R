@@ -2,7 +2,7 @@ library(ggplot2)
 library(RColorBrewer)
 
 setwd("/Users/kaylinwalker/R/textmining_southpark/")
-count.all <- read.csv("data/tidy data/southpark_tdm_all.csv", stringsAsFactors=FALSE)
+count.all <- read.csv("data/tidy data/southpark_tdm_speaker.csv", stringsAsFactors=FALSE)
 
 # think up all the swear words they might use
 swears <- c("fuck", "shit", "damn", "hell", "ass", "fatass", "asshole", "motherfucker", 

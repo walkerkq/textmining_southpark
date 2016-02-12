@@ -4,7 +4,7 @@ library(png)
 library(grid)
 
 setwd("/Users/kaylinwalker/R/textmining_southpark/")
-count.all <- read.csv("data/tidy data/southpark_tdm_all.csv", stringsAsFactors=FALSE)
+count.all <- read.csv("data/tidy data/southpark_tdm_speaker.csv", stringsAsFactors=FALSE)
 
 # function to get the log likelihood of each of a 
 # speaker's words vs. the rest of the dataframe
