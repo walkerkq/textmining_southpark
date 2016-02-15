@@ -11,7 +11,7 @@ library(stringr)
 library(ggplot2)
 opts_chunk$set(cache=FALSE, fig.width=10, echo=FALSE)
 
-setwd("/Users/kaylinwalker/R/textmining_southpark/")
+setwd("/Users/kwalker/git_projects/textmining_southpark/")
 ngrams <- read.csv("data/tidy data/southpark_ngrams.csv", stringsAsFactors=FALSE)
 ```
 
@@ -63,7 +63,7 @@ However, flaws have been identified: invalidity at low frequencies (Dunning, 199
 
 $$2 \sum O_i * ln(\frac{O_i}{E_i})$$  
 
-Which can be computed from the contingency table below as $2*((a*log(\frac{a}{E1}) + (b*log(\frac{b}{E2}))$, where E1 = $(a+c)*\frac{(a+b)}{(c+d)}$, and E2 = $(b+d)*\frac{(a+b)}{(c+d)}$.  
+Which can be computed from the contingency table below as $2*((a*log(\frac{a}{E1}) + (b*log(\frac{b}{E2}))$, where E1 = $(a+c)*\frac{(a+b)}{N}$, and E2 = $(b+d)*\frac{(a+b)}{N}$.  
 
 
 ```{r}
