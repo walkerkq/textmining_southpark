@@ -1,3 +1,6 @@
+# requires southpark_tdm_speaker.csv, generated in southpark_corpus_speaker.R
+# creates southpark_wordshare_plot.png
+
 library(ggplot2)
 library(RColorBrewer)
 

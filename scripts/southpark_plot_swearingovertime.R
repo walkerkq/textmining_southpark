@@ -1,8 +1,11 @@
+# requires southpark_tdm_episode.csv, generated in southpark_corpus_episode.R
+# creates southpark_profanitytime_plot.png
+
 library(ggplot2)
 library(RColorBrewer)
 library(reshape2)
 
-setwd("/Users/kwalker/git_projects/textmining_southpark/")
+setwd("/Users/kaylinwalker/R/textmining_southpark/")
 by.ep <- read.csv("data/tidy data/southpark_tdm_episode.csv", stringsAsFactors=FALSE)
 
 # get profanity counts 

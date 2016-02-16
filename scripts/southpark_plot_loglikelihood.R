@@ -1,3 +1,6 @@
+# requires southpark_tdm_speaker.csv, generated in southpark_corpus_speaker.R
+# generates plots/southpark_ranked_plot.png
+
 library(ggplot2)
 library(RColorBrewer)
 library(png)

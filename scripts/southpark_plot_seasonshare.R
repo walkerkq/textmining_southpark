@@ -1,8 +1,10 @@
+# generates southpark_seasonshare_plot.png
+
 library(stringr)
 library(ggplot2)
 
 # read in the data set
-setwd("/Users/kwalker/git_projects/textmining_southpark/data/raw data")
+setwd("/Users/kaylinwalker/R/textmining_southpark/data/raw data")
 if(file.exists("all-seasons.csv")) {
     scripts <- read.csv("all-seasons.csv", stringsAsFactors=FALSE)
 } else { 
@@ -11,6 +13,7 @@ if(file.exists("all-seasons.csv")) {
     scripts <- read.csv("all-seasons.csv", stringsAsFactors=FALSE)
 }
 scripts <- scripts[-7977, ] # a line in season 12 referring to a chef and not Chef
+
 # get total count by season 
 season.count <- NULL
 for(n in 1:18) {
@@ -39,10 +42,10 @@ for(speaker in speakers){
     }
 }
 rm(scripts)
+
+# clean up the data frame
 for(u in 1:3) speaker.season[,u] <- as.character(speaker.season[,u])
 speaker.season$season <- as.numeric(speaker.season$season)
-
-# clean up the text
 speaker.season$text <- tolower(speaker.season$text)
 speaker.season$text <- gsub("[[:punct:]]", "", speaker.season$text)
 speaker.season$text <- gsub("\\n", "", speaker.season$text)
@@ -61,11 +64,12 @@ ggplot(ss, aes(season, season.share)) +
     geom_bar(stat="identity", aes(fill=speaker)) + 
     scale_fill_manual(values = mycolors) +
     facet_grid(. ~ speaker) +
-    theme_bw() + labs(title="Share of Words Spoken each Season") + xlab("Season") + ylab("Share (%) of Words") +
+    theme_bw() + labs(title="Share of Words Spoken by Season") + xlab("Season") + ylab("Share (%) of Words") +
     theme(plot.title = element_text(size=18),
           axis.title.y=element_text(margin=margin(0,10,0,0)),
           legend.text = element_text(size = 14), 
-          legend.position=1) 
+          legend.position=1,
+          strip.text.x = element_text(size = 14)) 
 
 #dev.copy(png, 'plots/southpark_seasonshare_plot.png')
 #dev.off()

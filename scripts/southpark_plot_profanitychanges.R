@@ -1,3 +1,6 @@
+# requires southpark_tdm_episode.csv, generated in southpark_corpus_episode.R
+# creates southpark_profanitychanges_plot.png
+
 library(ggplot2)
 library(RColorBrewer)
 library(reshape2)
