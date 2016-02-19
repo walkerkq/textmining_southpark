@@ -37,4 +37,5 @@ ratings$votes <- gsub("\\,", "", ratings$votes)
 for(u in c(1,2,3,6,7)) ratings[,u] <- as.numeric(as.character(ratings[,u]))
 ratings$date <- as.Date(as.character(ratings$date), format="%d %b %Y")
 
+#setwd("/Users/kaylinwalker/R/textmining_southpark/data/tidy data/")
 #write.csv(ratings, "southpark_imdb_ratings.csv", row.names=FALSE)
