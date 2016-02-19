@@ -23,4 +23,4 @@ occurrence of a word in a particular corpus (the body of a character's speech) t
 (all of the remaining South Park text) to determine if it shows up more or less likely that expected. The returned 
 value represents the likelihood that the corpora are from the same, larger corpus, similar to a t-test.  
 
-[Read the full report](https://github.com/walkerkq/textmining_southpark/blob/master/southpark.pdf)
+[Read the full report](https://github.com/walkerkq/textmining_southpark/blob/master/southpark_loglikelihood.pdf)
